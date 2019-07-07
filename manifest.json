@@ -1,0 +1,18 @@
+{
+	"files": {
+		"README.md": "4c2f5d8115493be4e431fbdc6c84c4215ef4f54f4812acb3207959acdb0c34e2",
+		"index.js": "49dc33d79e1745d268c0a116b17cc4254fbf69e950ee354af9638583067ec276",
+		"module.json": "bcdc16f59a51ab78a7091acb35386c734ff1ea0860918dd394f040c503da12a7",
+		"settings.js": "3c49dfc7738111869c3d088d2792eb084a6dfc49be8d2699ef4e7f697491e765"
+	},
+	"defs": {
+		"C_CAST_FISHING_ROD": "raw",
+		"C_REQUEST_DESPAWN_SERVANT": 1,
+		"C_REQUEST_SPAWN_SERVANT": 1,
+		"C_USE_ITEM": 3,
+		"S_LOGIN": [12,13],
+		"S_REQUEST_DESPAWN_SERVANT": 1,
+		"S_REQUEST_SPAWN_SERVANT": 2,
+		"S_SPAWN_ME": "raw"
+	}
+}
