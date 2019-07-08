@@ -117,15 +117,15 @@ class AutoPet {
     });
 
     this.hook('C_CAST_FISHING_ROD', 'raw', () => {
-      //
-      this.send('Fishing detected. despawning companion.');
-      try {
-        this.mod.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
-        this.mod.clearInterval(this.food_interval);
-      } catch {
-        this.send(`Warning. companion could not be despawned`);
-        this.mod.warn('Unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.');
-      }
+      if (this.pet) {
+        this.send('Fishing detected. despawning companion.');
+        try {
+          this.mod.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
+          this.mod.clearInterval(this.food_interval);
+        } catch {
+          this.send(`Warning. companion could not be despawned`);
+          this.mod.warn('Unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.');
+        }}
     });
   }
 
