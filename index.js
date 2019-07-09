@@ -55,10 +55,11 @@ class AutoPet {
 
   trySpawnPet() {
     let pet = this.settings.pet[this.user.name];
-    this.mod.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
+    let res = this.mod.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
       id: pet.id,
       dbid: BigInt(pet.dbid)
     });
+    return res;
   }
 
   tryFeedingPet(id) {
@@ -93,11 +94,14 @@ class AutoPet {
       this.mod.hookOnce('S_SPAWN_ME', 'raw', () => {
         if (this.settings.enable) {
           if (this.settings.pet[this.user.name]) {
-            this.trySpawnPet();
-            this.food_interval = this.mod.setInterval(() => {
-              this.tryFeedingPet(206049);
-            }, (this.settings.interval * 60 * 1000));
-            this.send(`Spawned companion.`);
+            if (this.trySpawnPet()) {
+              this.food_interval = this.mod.setInterval(() => {
+                this.tryFeedingPet(206049);
+              }, (this.settings.interval * 60 * 1000));
+              this.send(`Spawning companion.`);
+            } else {
+              this.send(`Warning. pet could not be spawned.`);
+            }
           }
         }
       });
@@ -117,7 +121,7 @@ class AutoPet {
     });
 
     this.hook('C_CAST_FISHING_ROD', 'raw', () => {
-      if (this.pet) {
+      if (!this.settings.fishing && this.pet) {
         this.send('Fishing detected. despawning companion.');
         try {
           this.mod.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
