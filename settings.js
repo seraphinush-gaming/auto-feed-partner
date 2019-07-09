@@ -2,6 +2,7 @@
 
 const DefaultSettings = {
   "enable": true,
+  "fishing": false,
   "interval": 30,
   "pet": {}
 };

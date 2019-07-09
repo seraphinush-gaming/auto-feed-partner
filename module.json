@@ -6,7 +6,7 @@
   "name": "auto-pet",
   "options": {
     "reloadable": true,
-    "settingsVersion": 1,
+    "settingsVersion": 2,
     "settingsFile": "config.json",
     "settingsMigrator": "settings.js"
   },
@@ -14,5 +14,5 @@
     "https://raw.githubusercontent.com/seraphinush-gaming/auto-pet/master/"
   ],
   "supportUrl": "https://github.com/seraphinush-gaming/auto-pet/blob/master/README.md",
-  "version": "1.00.04"
+  "version": "1.00.05"
 }
