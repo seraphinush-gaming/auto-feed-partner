@@ -12,13 +12,17 @@ class AutoPet {
     this.user = {
       gameId: BigInt(0),
       name: ''
-    }
+    };
 
     // command
     this.cmd.add('pet', {
       '$none': () => {
         this.settings.enable = !this.settings.enable;
         this.send(`${this.settings.enable ? 'en' : 'dis'}abled`);
+      },
+      'fishing': () => {
+        this.settings.fishing = !this.settings.fishing;
+        this.send(`Companion spawned whiled fishing ${this.settings.fishing ? 'en' : 'dis'}abled.`);
       },
       'set': (num) => {
         if (!isNaN(num)) {
@@ -29,7 +33,7 @@ class AutoPet {
         }
       },
       '$default': () => {
-        this.send(`Invalid argument. usage : pet [set]`);
+        this.send(`Invalid argument. usage : pet [fishing|set]`);
       }
     });
 
@@ -63,21 +67,19 @@ class AutoPet {
   }
 
   tryFeedingPet(id) {
-    try {
-      if (this.pet) {
-        this.mod.send('C_USE_ITEM', 3, {
-          gameId: this.user.gameId,
-          id: id,
-          amount: 1,
-          unk4: true
-        });
+    if (this.pet) {
+      let res = this.mod.trySend('C_USE_ITEM', 3, {
+        gameId: this.user.gameId,
+        id: id,
+        amount: 1,
+        unk4: true
+      });
+      if (res) {
         this.send(`Fed companion pet food.`);
       } else {
         this.mod.clearInterval(this.food_interval);
+        this.send(`Warning. pet food could not be fed.`);
       }
-    }
-    catch {
-      this.send(`Warning. pet food could not be fed.`);
     }
   }
 
@@ -92,16 +94,15 @@ class AutoPet {
       this.user.name = e.name;
 
       this.mod.hookOnce('S_SPAWN_ME', 'raw', () => {
-        if (this.settings.enable) {
-          if (this.settings.pet[this.user.name]) {
-            if (this.trySpawnPet()) {
-              this.food_interval = this.mod.setInterval(() => {
-                this.tryFeedingPet(206049);
-              }, (this.settings.interval * 60 * 1000));
-              this.send(`Spawning companion.`);
-            } else {
-              this.send(`Warning. pet could not be spawned.`);
-            }
+        if (this.settings.enable && this.settings.pet[this.user.name]) {
+          //
+          if (this.trySpawnPet()) {
+            this.food_interval = this.mod.setInterval(() => {
+              this.tryFeedingPet(206049);
+            }, (this.settings.interval * 60 * 1000));
+            this.send(`Spawning companion.`);
+          } else {
+            this.send(`Warning. pet could not be spawned.`);
           }
         }
       });
@@ -121,7 +122,7 @@ class AutoPet {
     });
 
     this.hook('C_CAST_FISHING_ROD', 'raw', () => {
-      if (!this.settings.fishing && this.pet) {
+      if (this.settings.enable && !this.settings.fishing && this.pet) {
         this.send('Fishing detected. despawning companion.');
         try {
           this.mod.send('C_REQUEST_DESPAWN_SERVANT', 1, {});

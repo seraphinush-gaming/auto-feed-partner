@@ -17,6 +17,9 @@ Support seraph via paypal donations, thanks in advance !
 - __pet__
   - Toggle on/off
 ### Arguments
+- __fishing__
+  - Toggle pet staying spawned while fishing on/off
+  - Default is `false`
 - __set num__
   - Set pet feeding interval to `num` minutes
   - Default is `30` minutes
