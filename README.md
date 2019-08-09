@@ -27,6 +27,9 @@ Support seraph via paypal donations, thanks in advance !
 ## Changelog
 <details>
 
+    1.01
+    - Incorporated `tera-game-state`
+    - Added mount check
     1.00
     - Initial commit
 

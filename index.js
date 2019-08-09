@@ -8,6 +8,8 @@ class AutoPet {
     this.hooks = [];
 
     this.food_interval = 0;
+    this.hold = false;
+    this.feedPet = false;
     this.pet = undefined;
     this.user = {
       gameId: BigInt(0),
@@ -35,6 +37,29 @@ class AutoPet {
       '$default': () => {
         this.send(`Invalid argument. usage : pet [fishing|set]`);
       }
+    });
+
+    // game state
+    this.mod.game.on('enter_game', () => {
+      this.user.gameId = this.mod.game.me.gameId;
+      this.user.name = this.mod.game.me.name;
+
+      this.mod.hookOnce('S_SPAWN_ME', 'raw', { order: 10 }, () => {
+        if (this.settings.enable && this.settings.pet[this.user.name]) {
+          if (this.trySpawnPet()) {
+            this.food_interval = this.mod.setInterval(() => {
+              if (!this.hold) {
+                this.tryFeedingPet(206049);
+              } else {
+                this.feedPet = true;
+              }
+            }, (this.settings.interval * 60 * 1000));
+            this.send(`Spawning companion.`);
+          } else {
+            this.send(`Warning. pet could not be spawned.`);
+          }
+        }
+      });
     });
 
     this.load();
@@ -88,14 +113,20 @@ class AutoPet {
     this.hooks.push(this.mod.hook(...arguments));
   }
 
+  tryHook() {
+    let _ = this.mod.tryHook(...arguments);
+    if (!_) {
+      this.send(`Unmapped protocol packet found.`);
+    }
+  }
+
   load() {
-    this.hook('S_LOGIN', this.mod.majorPatchVersion >= 81 ? 13 : 12, { order: - 1000 }, (e) => {
+    /* this.hook('S_LOGIN', this.mod.majorPatchVersion >= 81 ? 13 : 12, { order: -1000 }, (e) => {
       this.user.gameId = e.gameId;
       this.user.name = e.name;
 
       this.mod.hookOnce('S_SPAWN_ME', 'raw', () => {
         if (this.settings.enable && this.settings.pet[this.user.name]) {
-          //
           if (this.trySpawnPet()) {
             this.food_interval = this.mod.setInterval(() => {
               this.tryFeedingPet(206049);
@@ -106,7 +137,7 @@ class AutoPet {
           }
         }
       });
-    });
+    }); */
 
     this.hook('S_REQUEST_SPAWN_SERVANT', 2, { order: 10 }, (e) => {
       if (e.ownerId === this.user.gameId) {
@@ -121,7 +152,21 @@ class AutoPet {
       }
     });
 
-    this.hook('C_CAST_FISHING_ROD', 'raw', () => {
+    // mount
+    this.hook('S_MOUNT_VEHICLE', 'raw', () => {
+      this.hold = true;
+    });
+
+    this.hook('S_UNMOUNT_VEHICLE', 'raw', () => {
+      this.hold = false;
+      if (this.feedPet) {
+        this.tryFeedingPet(206049);
+        this.feedPet = false;
+      }
+    });
+
+    // fishing
+    this.tryHook('C_CAST_FISHING_ROD', 'raw', { order: 10 }, () => {
       if (this.settings.enable && !this.settings.fishing && this.pet) {
         this.send('Fishing detected. despawning companion.');
         try {
@@ -130,7 +175,8 @@ class AutoPet {
         } catch {
           this.send(`Warning. companion could not be despawned`);
           this.mod.warn('Unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.');
-        }}
+        }
+      }
     });
   }
 
@@ -149,7 +195,7 @@ class AutoPet {
     let state = {
       pet: this.pet,
       user: this.user
-    }
+    };
     return state;
   }
 
