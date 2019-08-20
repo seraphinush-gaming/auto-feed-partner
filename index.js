@@ -4,12 +4,13 @@ class AutoPet {
 
     this.mod = mod;
     this.cmd = mod.command;
+    this.game = mod.game;
     this.settings = mod.settings;
     this.hooks = [];
 
+    this.feedPet = false;
     this.food_interval = 0;
     this.hold = false;
-    this.feedPet = false;
     this.pet = undefined;
     this.user = {
       gameId: BigInt(0),
@@ -40,9 +41,9 @@ class AutoPet {
     });
 
     // game state
-    this.mod.game.on('enter_game', () => {
-      this.user.gameId = this.mod.game.me.gameId;
-      this.user.name = this.mod.game.me.name;
+    this.game.on('enter_game', () => {
+      this.user.gameId = this.game.me.gameId;
+      this.user.name = this.game.me.name;
 
       this.mod.hookOnce('S_SPAWN_ME', 'raw', { order: 10 }, () => {
         if (this.settings.enable && this.settings.pet[this.user.name]) {
@@ -74,14 +75,18 @@ class AutoPet {
 
     this.user = undefined;
     this.pet = undefined;
+    this.hold = undefined;
     this.food_interval = undefined;
+    this.feedPet = undefined;
 
     this.hooks = undefined;
     this.settings = undefined;
+    this.game = undefined;
     this.cmd = undefined;
     this.mod = undefined;
   }
 
+  // helper
   trySpawnPet() {
     let pet = this.settings.pet[this.user.name];
     let res = this.mod.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
@@ -121,24 +126,7 @@ class AutoPet {
   }
 
   load() {
-    /* this.hook('S_LOGIN', this.mod.majorPatchVersion >= 81 ? 13 : 12, { order: -1000 }, (e) => {
-      this.user.gameId = e.gameId;
-      this.user.name = e.name;
-
-      this.mod.hookOnce('S_SPAWN_ME', 'raw', () => {
-        if (this.settings.enable && this.settings.pet[this.user.name]) {
-          if (this.trySpawnPet()) {
-            this.food_interval = this.mod.setInterval(() => {
-              this.tryFeedingPet(206049);
-            }, (this.settings.interval * 60 * 1000));
-            this.send(`Spawning companion.`);
-          } else {
-            this.send(`Warning. pet could not be spawned.`);
-          }
-        }
-      });
-    }); */
-
+    // servant
     this.hook('S_REQUEST_SPAWN_SERVANT', 2, { order: 10 }, (e) => {
       if (e.ownerId === this.user.gameId) {
         this.pet = e.gameId;
