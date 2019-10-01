@@ -1,3 +1,5 @@
+'use strict';
+
 class AutoPet {
 
   constructor(mod) {
@@ -50,7 +52,7 @@ class AutoPet {
           if (this.trySpawnPet()) {
             this.food_interval = this.mod.setInterval(() => {
               if (!this.hold) {
-                this.tryFeedingPet(206049);
+                this.tryFeedingPet();
               } else {
                 this.feedPet = true;
               }
@@ -61,6 +63,19 @@ class AutoPet {
           }
         }
       });
+    });
+
+    // mount
+    this.game.me.on('mount', () => {
+      this.hold = true;
+    });
+
+    this.game.me.on('dismount', () => {
+      this.hold = false;
+      if (this.feedPet) {
+        this.tryFeedingPet();
+        this.feedPet = false;
+      }
     });
 
     this.load();
@@ -96,11 +111,11 @@ class AutoPet {
     return res;
   }
 
-  tryFeedingPet(id) {
+  tryFeedingPet() {
     if (this.pet) {
       let res = this.mod.trySend('C_USE_ITEM', 3, {
         gameId: this.user.gameId,
-        id: id,
+        id: 206049,
         amount: 1,
         unk4: true
       });
@@ -137,19 +152,6 @@ class AutoPet {
     this.hook('S_REQUEST_DESPAWN_SERVANT', 1, { order: 10 }, (e) => {
       if (this.pet === e.gameId) {
         this.pet = undefined;
-      }
-    });
-
-    // mount
-    this.hook('S_MOUNT_VEHICLE', 'raw', () => {
-      this.hold = true;
-    });
-
-    this.hook('S_UNMOUNT_VEHICLE', 'raw', () => {
-      this.hold = false;
-      if (this.feedPet) {
-        this.tryFeedingPet(206049);
-        this.feedPet = false;
       }
     });
 

@@ -1,8 +1,8 @@
 {
 	"files": {
 		"README.md": "2ded71142518b56ab7cf25e4fe4f98603387d1d43547219afce40bf8d05c4706",
-		"index.js": "9e8268adb573d8dcb317aa5b9614d72bc324b47253efba4b928964d67da21542",
-		"module.json": "604c86655455c82be57474f1264ebb23dff31cc592fe0809cc52e124dcc60bf2",
+		"index.js": "c9491e0c93d55c5b2b8a94b25c4c82be8b219f87a5d198876ae19a48c767ec13",
+		"module.json": "527e2308428e93719d44a55d2cda564828b5a86501bbeddb542add00e429cc2c",
 		"settings.js": "97d16b2c33f238438f56c1f84c1c02adda90eb9c9dc74c6cc717074ca29b8a0e"
 	},
 	"defs": {
@@ -10,10 +10,8 @@
 		"C_REQUEST_DESPAWN_SERVANT": 1,
 		"C_REQUEST_SPAWN_SERVANT": 1,
 		"C_USE_ITEM": 3,
-		"S_MOUNT_VEHICLE": "raw",
 		"S_REQUEST_DESPAWN_SERVANT": 1,
 		"S_REQUEST_SPAWN_SERVANT": 3,
-		"S_SPAWN_ME": "raw",
-		"S_UNMOUNT_VEHICLE": "raw"
+		"S_SPAWN_ME": "raw"
 	}
 }
