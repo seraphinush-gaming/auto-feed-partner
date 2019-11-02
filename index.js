@@ -1,40 +1,41 @@
 'use strict';
 
-class AutoPet {
+class auto_pet {
 
   constructor(mod) {
 
-    this.mod = mod;
-    this.cmd = mod.command;
-    this.game = mod.game;
-    this.settings = mod.settings;
+    this.m = mod;
+    this.c = mod.command;
+    this.g = mod.game;
+    this.s = mod.settings;
     this.hooks = [];
 
-    this.feedPet = false;
+    this.feed_pet = false;
     this.food_interval = 0;
     this.hold = false;
-    this.pet = undefined;
+    this.pet = BigInt(0);
     this.user = {
       gameId: BigInt(0),
       name: ''
     };
 
     // command
-    this.cmd.add('pet', {
+    this.c.add('pet', {
       '$none': () => {
-        this.settings.enable = !this.settings.enable;
-        this.send(`${this.settings.enable ? 'en' : 'dis'}abled`);
+        this.s.enable = !this.s.enable;
+        this.send(`${this.s.enable ? 'en' : 'dis'}abled`);
       },
       'fishing': () => {
-        this.settings.fishing = !this.settings.fishing;
-        this.send(`Companion spawned whiled fishing ${this.settings.fishing ? 'en' : 'dis'}abled.`);
+        this.s.fishing = !this.s.fishing;
+        this.send(`Companion spawned whiled fishing ${this.s.fishing ? 'en' : 'dis'}abled.`);
       },
       'set': (num) => {
+        num = parseInt(num);
         if (!isNaN(num)) {
-          this.settings.interval = num;
+          this.s.interval = num;
           this.send(`Set pet feeding interval to ${num} minutes.`);
         } else {
-          this.send(`Invalid argument. usage : pet set (num)`);
+          this.send(`Invalid argument. usage : pet set &lt;num&gt;`);
         }
       },
       '$default': () => {
@@ -43,20 +44,16 @@ class AutoPet {
     });
 
     // game state
-    this.game.on('enter_game', () => {
-      this.user.gameId = this.game.me.gameId;
-      this.user.name = this.game.me.name;
+    this.g.on('enter_game', () => {
+      this.user.gameId = this.g.me.gameId;
+      this.user.name = this.g.me.name;
 
-      this.mod.hookOnce('S_SPAWN_ME', 'raw', { order: 10 }, () => {
-        if (this.settings.enable && this.settings.pet[this.user.name]) {
-          if (this.trySpawnPet()) {
-            this.food_interval = this.mod.setInterval(() => {
-              if (!this.hold) {
-                this.tryFeedingPet();
-              } else {
-                this.feedPet = true;
-              }
-            }, (this.settings.interval * 60 * 1000));
+      this.m.hookOnce('S_SPAWN_ME', 'raw', { order: 10 }, () => {
+        if (this.s.enable && this.s.pet[this.user.name]) {
+          if (this.try_spawn_pet()) {
+            this.food_interval = this.m.setInterval(() => {
+              !this.hold ? this.try_feeding_pet() : this.feed_pet = true;
+            }, (this.s.interval * 60 * 1000));
             this.send(`Spawning companion.`);
           } else {
             this.send(`Warning. pet could not be spawned.`);
@@ -66,15 +63,15 @@ class AutoPet {
     });
 
     // mount
-    this.game.me.on('mount', () => {
+    this.g.me.on('mount', () => {
       this.hold = true;
     });
 
-    this.game.me.on('dismount', () => {
+    this.g.me.on('dismount', () => {
       this.hold = false;
-      if (this.feedPet) {
-        this.tryFeedingPet();
-        this.feedPet = false;
+      if (this.feed_pet) {
+        this.try_feeding_pet();
+        this.feed_pet = false;
       }
     });
 
@@ -83,37 +80,24 @@ class AutoPet {
   }
 
   destructor() {
-    this.mod.clearInterval(this.food_interval);
-    this.mod.saveSettings();
-    this.cmd.remove('pet');
+    this.m.clearInterval(this.food_interval);
+    this.c.remove('pet');
     this.unload();
-
-    this.user = undefined;
-    this.pet = undefined;
-    this.hold = undefined;
-    this.food_interval = undefined;
-    this.feedPet = undefined;
-
-    this.hooks = undefined;
-    this.settings = undefined;
-    this.game = undefined;
-    this.cmd = undefined;
-    this.mod = undefined;
   }
 
   // helper
-  trySpawnPet() {
-    let pet = this.settings.pet[this.user.name];
-    let res = this.mod.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
+  try_spawn_pet() {
+    let pet = this.s.pet[this.user.name];
+    let res = this.m.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
       id: pet.id,
       dbid: BigInt(pet.dbid)
     });
     return res;
   }
 
-  tryFeedingPet() {
+  try_feeding_pet() {
     if (this.pet) {
-      let res = this.mod.trySend('C_USE_ITEM', 3, {
+      let res = this.m.trySend('C_USE_ITEM', 3, {
         gameId: this.user.gameId,
         id: 206049,
         amount: 1,
@@ -122,7 +106,7 @@ class AutoPet {
       if (res) {
         this.send(`Fed companion pet food.`);
       } else {
-        this.mod.clearInterval(this.food_interval);
+        this.m.clearInterval(this.food_interval);
         this.send(`Warning. pet food could not be fed.`);
       }
     }
@@ -130,14 +114,12 @@ class AutoPet {
 
   // code
   hook() {
-    this.hooks.push(this.mod.hook(...arguments));
+    this.hooks.push(this.m.hook(...arguments));
   }
 
   tryHook() {
-    let _ = this.mod.tryHook(...arguments);
-    if (!_) {
-      this.send(`Unmapped protocol packet found.`);
-    }
+    let res = this.m.tryHook(...arguments);
+    !res ? this.send(`Unmapped protocol packet found.`) : null;
   }
 
   load() {
@@ -145,26 +127,24 @@ class AutoPet {
     this.hook('S_REQUEST_SPAWN_SERVANT', 3, { order: 10 }, (e) => {
       if (e.ownerId === this.user.gameId) {
         this.pet = e.gameId;
-        this.settings.pet[this.user.name] = { id: e.id, dbid: e.dbid.toString() };
+        this.s.pet[this.user.name] = { id: e.id, dbid: e.dbid.toString() };
       }
     });
 
     this.hook('S_REQUEST_DESPAWN_SERVANT', 1, { order: 10 }, (e) => {
-      if (this.pet === e.gameId) {
-        this.pet = undefined;
-      }
+      this.pet === e.gameId ? this.pet = undefined : null;
     });
 
     // fishing
     this.tryHook('C_CAST_FISHING_ROD', 'raw', { order: 10 }, () => {
-      if (this.settings.enable && !this.settings.fishing && this.pet) {
+      if (this.s.enable && !this.s.fishing && this.pet) {
         this.send('Fishing detected. despawning companion.');
         try {
-          this.mod.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
-          this.mod.clearInterval(this.food_interval);
+          this.m.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
+          this.m.clearInterval(this.food_interval);
         } catch {
           this.send(`Warning. companion could not be despawned`);
-          this.mod.warn('Unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.');
+          this.m.warn('Unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.');
         }
       }
     });
@@ -173,12 +153,12 @@ class AutoPet {
   unload() {
     if (this.hooks.length) {
       for (let h of this.hooks)
-        this.mod.unhook(h);
+        this.m.unhook(h);
       this.hooks = [];
     }
   }
 
-  send() { this.cmd.message(': ' + [...arguments].join('\n\t - ')); }
+  send() { this.c.message(': ' + [...arguments].join('\n\t - ')); }
 
   // reload
   saveState() {
@@ -196,4 +176,4 @@ class AutoPet {
 
 }
 
-module.exports = AutoPet;
+module.exports = auto_pet;
