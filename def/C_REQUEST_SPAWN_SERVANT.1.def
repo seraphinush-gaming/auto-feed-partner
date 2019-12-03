@@ -1,0 +1,4 @@
+# majorPatchVersion >= 81
+
+uint32   id
+uint64   dbid

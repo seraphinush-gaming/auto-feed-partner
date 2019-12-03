@@ -27,6 +27,9 @@ Support seraph via paypal donations, thanks in advance !
 ## Changelog
 <details>
 
+    1.02
+    - Added respawn feature upon changing zone after fishing
+    - Added dynamic definition load
     1.01
     - Incorporated `tera-game-state`
     - Added mount check

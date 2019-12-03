@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require('path');
+
 class auto_pet {
 
   constructor(mod) {
@@ -10,14 +12,24 @@ class auto_pet {
     this.s = mod.settings;
     this.hooks = [];
 
+    // initialize
     this.feed_pet = false;
     this.food_interval = 0;
-    this.hold = false;
+    this.hold_feeding = false;
+    this.to_spawn_next_zone = false;
     this.pet = BigInt(0);
     this.user = {
       gameId: BigInt(0),
       name: ''
     };
+
+    // set definition
+    try {
+      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 1, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.1.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 1, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.1.def'), true);
+    } catch {
+      this.m.warn('Error. could not add required definition(s).');
+    }
 
     // command
     this.c.add('pet', {
@@ -29,11 +41,11 @@ class auto_pet {
         this.s.fishing = !this.s.fishing;
         this.send(`Companion spawned whiled fishing ${this.s.fishing ? 'en' : 'dis'}abled.`);
       },
-      'set': (num) => {
-        num = parseInt(num);
-        if (!isNaN(num)) {
-          this.s.interval = num;
-          this.send(`Set pet feeding interval to ${num} minutes.`);
+      'set': (n) => {
+        n = parseInt(n);
+        if (!isNaN(n)) {
+          this.s.interval = n;
+          this.send(`Set pet feeding interval to ${n} minutes.`);
         } else {
           this.send(`Invalid argument. usage : pet set &lt;num&gt;`);
         }
@@ -48,11 +60,11 @@ class auto_pet {
       this.user.gameId = this.g.me.gameId;
       this.user.name = this.g.me.name;
 
-      this.m.hookOnce('S_SPAWN_ME', 'raw', { order: 10 }, () => {
+      this.m.hookOnce('S_SPAWN_ME', 'event', { order: 10 }, () => {
         if (this.s.enable && this.s.pet[this.user.name]) {
           if (this.try_spawn_pet()) {
             this.food_interval = this.m.setInterval(() => {
-              !this.hold ? this.try_feeding_pet() : this.feed_pet = true;
+              !this.hold_feeding ? this.try_feeding_pet() : this.feed_pet = true;
             }, (this.s.interval * 60 * 1000));
             this.send(`Spawning companion.`);
           } else {
@@ -62,13 +74,20 @@ class auto_pet {
       });
     });
 
+    this.g.me.on('change_zone', () => {
+      if (this.to_spawn_next_zone) {
+        this.to_spawn_next_zone = false;
+        this.try_spawn_pet();
+      }
+    });
+
     // mount
     this.g.me.on('mount', () => {
-      this.hold = true;
+      this.hold_feeding = true;
     });
 
     this.g.me.on('dismount', () => {
-      this.hold = false;
+      this.hold_feeding = false;
       if (this.feed_pet) {
         this.try_feeding_pet();
         this.feed_pet = false;
@@ -136,11 +155,12 @@ class auto_pet {
     });
 
     // fishing
-    this.tryHook('C_CAST_FISHING_ROD', 'raw', { order: 10 }, () => {
+    this.tryHook('C_CAST_FISHING_ROD', 'event', { order: 10 }, () => {
       if (this.s.enable && !this.s.fishing && this.pet) {
         this.send('Fishing detected. despawning companion.');
         try {
           this.m.send('C_REQUEST_DESPAWN_SERVANT', 1, {});
+          this.to_spawn_next_zone = true;
           this.m.clearInterval(this.food_interval);
         } catch {
           this.send(`Warning. companion could not be despawned`);
