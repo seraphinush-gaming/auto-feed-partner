@@ -2,6 +2,15 @@
 
 const path = require('path');
 
+const BAIT = [
+  206000, 206001, 206002, 206003, 206004, // bait i-v
+  206905, // dappled bait
+  206053, // pilidium bait
+  206901, // popo bait
+  206900, // popori bait
+  206904 // rainbow bait
+];
+
 class auto_pet {
 
   constructor(mod) {
@@ -18,10 +27,6 @@ class auto_pet {
     this.hold_feeding = false;
     this.to_spawn_next_zone = false;
     this.pet = BigInt(0);
-    this.user = {
-      gameId: BigInt(0),
-      name: ''
-    };
 
     // set definition
     try {
@@ -35,7 +40,8 @@ class auto_pet {
     this.c.add('pet', {
       '$none': () => {
         this.s.enable = !this.s.enable;
-        this.send(`${this.s.enable ? 'en' : 'dis'}abled`);
+        this.s.enable ? this.load() : this.unload();
+        this.send(`${this.s.enable ? 'En' : 'Dis'}abled`);
       },
       'fishing': () => {
         this.s.fishing = !this.s.fishing;
@@ -51,21 +57,16 @@ class auto_pet {
           this.send(`Invalid argument. usage : pet set &lt;num&gt;`);
         }
       },
-      '$default': () => {
-        this.send(`Invalid argument. usage : pet [fishing|set]`);
-      }
+      '$default': () => { this.send(`Invalid argument. usage : pet [fishing|set]`); }
     });
 
     // game state
     this.g.on('enter_game', () => {
-      this.user.gameId = this.g.me.gameId;
-      this.user.name = this.g.me.name;
-
-      this.m.hookOnce('S_SPAWN_ME', 'event', { order: 10 }, () => {
-        if (this.s.enable && this.s.pet[this.user.name]) {
-          this.handle_spawn_pet();
-        }
-      });
+      if (this.s.enable) {
+        this.m.hookOnce('S_SPAWN_ME', 'event', { order: 10 }, () => {
+          this.s.pet[this.g.me.name] ? this.handle_spawn_pet() : null;
+        });
+      }
     });
 
     this.g.me.on('change_zone', () => {
@@ -87,7 +88,7 @@ class auto_pet {
       }
     });
 
-    this.load();
+    this.enable ? this.load() : null;
 
   }
 
@@ -117,7 +118,7 @@ class auto_pet {
 
   // helper
   try_spawn_pet() {
-    let pet = this.s.pet[this.user.name];
+    let pet = this.s.pet[this.g.me.name];
     let res = this.m.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
       id: pet.id,
       dbid: BigInt(pet.dbid)
@@ -128,7 +129,7 @@ class auto_pet {
   try_feed_pet() {
     if (this.pet) {
       this.m.send('C_USE_ITEM', 3, {
-        gameId: this.user.gameId,
+        gameId: this.g.me.gameId,
         id: 206049,
         amount: 1,
         unk4: true
@@ -145,9 +146,9 @@ class auto_pet {
   load() {
     // servant
     this.hook('S_REQUEST_SPAWN_SERVANT', 3, { order: 10 }, (e) => {
-      if (e.ownerId === this.user.gameId) {
+      if (e.ownerId === this.g.me.gameId) {
         this.pet = e.gameId;
-        this.s.pet[this.user.name] = { id: e.id, dbid: e.dbid.toString() };
+        this.s.pet[this.g.me.name] = { id: e.id, dbid: e.dbid.toString() };
       }
     });
 
@@ -156,21 +157,28 @@ class auto_pet {
     });
 
     // fishing
-    let res = this.m.tryHook('C_CAST_FISHING_ROD', 'event', { order: 10 }, () => {
+    this.hook('S_SYSTEM_MESSAGE', 1, { order: 10 }, (e) => {
       if (this.s.enable && !this.s.fishing && this.pet) {
-        this.send(`Fishing detected. despawning companion.`);
-        let despawn_res = this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 1, {});
+        let msg = this.mod.parseSystemMessage(e.message);
 
-        if (despawn_res) {
-          this.to_spawn_next_zone = true;
-          this.m.clearInterval(this.food_interval);
-        } else {
-          this.send(`Warning. companion could not be despawned`);
-          this.m.warn(`Warning. unmapped protocol packet \<C_REQUEST_DESPAWN_SERVANT\>.`);
+        switch (msg.id) {
+          case 'SMT_ITEM_USED_ACTIVE':
+            let item = parseInt(msg.tokens.ItemName.substr(6), 10);
+            if (BAIT.includes(item)) {
+              this.send(`Fishing detected. despawning companion.`);
+              let despawn = this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 1, {});
+
+              if (despawn) {
+                this.to_spawn_next_zone = true;
+                this.m.clearInterval(this.food_interval);
+              }
+              else {
+                this.send(`Warning. companion could not be despawned`);
+              }
+            }
         }
       }
     });
-    !res ? this.m.log(`Warning. unmapped protocol packet \<C_CAST_FISHING_ROD\>.`) : null;
   }
 
   unload() {
@@ -185,16 +193,11 @@ class auto_pet {
 
   // reload
   saveState() {
-    let state = {
-      pet: this.pet,
-      user: this.user
-    };
-    return state;
+    return this.pet;
   }
 
   loadState(state) {
-    this.pet = state.pet;
-    this.user = state.user;
+    this.pet = state;
   }
 
 }
