@@ -159,7 +159,7 @@ class auto_pet {
     // fishing
     this.hook('S_SYSTEM_MESSAGE', 1, { order: 10 }, (e) => {
       if (this.s.enable && !this.s.fishing && this.pet) {
-        let msg = this.mod.parseSystemMessage(e.message);
+        let msg = this.m.parseSystemMessage(e.message);
 
         switch (msg.id) {
           case 'SMT_ITEM_USED_ACTIVE':
