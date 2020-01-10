@@ -88,7 +88,7 @@ class auto_pet {
       }
     });
 
-    this.enable ? this.load() : null;
+    this.s.enable ? this.load() : null;
 
   }
 
