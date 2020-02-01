@@ -30,8 +30,8 @@ class auto_pet {
 
     // set definition
     try {
-      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 1, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.1.def'), true);
-      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 1, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.1.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 0, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.0.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 0, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.0.def'), true);
     } catch {
       this.m.warn(`Error. could not add required definition(s).`);
     }
@@ -119,7 +119,7 @@ class auto_pet {
   // helper
   try_spawn_pet() {
     let pet = this.s.pet[this.g.me.name];
-    let res = this.m.trySend('C_REQUEST_SPAWN_SERVANT', 1, {
+    let res = this.m.trySend('C_REQUEST_SPAWN_SERVANT', 0, {
       id: pet.id,
       dbid: BigInt(pet.dbid)
     });
@@ -166,7 +166,7 @@ class auto_pet {
             let item = parseInt(msg.tokens.ItemName.substr(6), 10);
             if (BAIT.includes(item)) {
               this.send(`Fishing detected. despawning companion.`);
-              let despawn = this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 1, {});
+              let despawn = this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 0, {});
 
               if (despawn) {
                 this.to_spawn_next_zone = true;
