@@ -2,7 +2,6 @@
 
 const DefaultSettings = {
   "enable": true,
-  "fishing": false,
   "interval": 30,
   "pet": {}
 };
@@ -21,7 +20,8 @@ function MigrateSettings(from_ver, to_ver, settings) {
     }
 
     switch (to_ver) {
-      //
+      case 3:
+        delete settings.fishing;
     }
 
     return settings;

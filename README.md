@@ -17,9 +17,6 @@ Support seraph via paypal donations, thanks in advance !
 - __pet__
   - Toggle on/off
 ### Arguments
-- __fishing__
-  - Toggle pet staying spawned while fishing on/off
-  - Default is `false`
 - __set <num>__
   - Set pet feeding interval to `num` minutes
   - Default is `30` minutes
@@ -27,6 +24,8 @@ Support seraph via paypal donations, thanks in advance !
 ## Changelog
 <details>
 
+    1.03
+    - Removed `fishing` option
     1.02
     - Added respawn feature upon changing zone after fishing
     - Added dynamic definition load

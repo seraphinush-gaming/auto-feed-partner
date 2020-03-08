@@ -2,15 +2,6 @@
 
 const path = require('path');
 
-const BAIT = [
-  206000, 206001, 206002, 206003, 206004, // bait i-v
-  206905, // dappled bait
-  206053, // pilidium bait
-  206901, // popo bait
-  206900, // popori bait
-  206904 // rainbow bait
-];
-
 class auto_pet {
 
   constructor(mod) {
@@ -25,13 +16,12 @@ class auto_pet {
     this.feed_pet = false;
     this.food_interval = 0;
     this.hold_feeding = false;
-    this.to_spawn_next_zone = false;
     this.pet = BigInt(0);
 
     // set definition
     try {
-      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 0, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.0.def'), true);
-      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 0, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.0.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 81, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.81.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 81, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.81.def'), true);
     } catch {
       this.m.warn(`Error. could not add required definition(s).`);
     }
@@ -43,10 +33,6 @@ class auto_pet {
         this.s.enable ? this.load() : this.unload();
         this.send(`${this.s.enable ? 'En' : 'Dis'}abled`);
       },
-      'fishing': () => {
-        this.s.fishing = !this.s.fishing;
-        this.send(`Companion spawned whiled fishing ${this.s.fishing ? 'en' : 'dis'}abled.`);
-      },
       'set': (n) => {
         n = parseInt(n);
         if (!isNaN(n)) {
@@ -57,7 +43,7 @@ class auto_pet {
           this.send(`Invalid argument. usage : pet set &lt;num&gt;`);
         }
       },
-      '$default': () => { this.send(`Invalid argument. usage : pet [fishing|set]`); }
+      '$default': () => { this.send(`Invalid argument. usage : pet [set]`); }
     });
 
     // game state
@@ -69,22 +55,17 @@ class auto_pet {
       }
     });
 
-    this.g.me.on('change_zone', () => {
-      if (this.to_spawn_next_zone) {
-        this.to_spawn_next_zone = false;
-        this.handle_spawn_pet();
-      }
-    });
-
     this.g.me.on('mount', () => {
-      this.hold_feeding = true;
+      this.s.enable ? this.hold_feeding = true : null;
     });
 
     this.g.me.on('dismount', () => {
-      this.hold_feeding = false;
-      if (this.feed_pet) {
-        this.try_feed_pet();
-        this.feed_pet = false;
+      if (this.s.enable) {
+        this.hold_feeding = false;
+        if (this.feed_pet) {
+          this.handle_feed_pet();
+          this.feed_pet = false;
+        }
       }
     });
 
@@ -102,7 +83,23 @@ class auto_pet {
   handle_interval() {
     this.m.clearInterval(this.food_interval);
     this.food_interval = this.m.setInterval(() => {
-      !this.hold_feeding ? this.try_feed_pet() : this.feed_pet = true;
+      if (!this.hold_feeding) {
+        this.handle_feed_pet();
+      }
+      else {
+        if (!this.feed_pet) {
+          this.feed_pet = true;
+        }
+        else {
+          if (this.try_despawn_pet()) {
+            this.m.clearInterval(this.food_interval);
+            this.send(`Could not feed more than once, dismissing companion.`);
+          } else {
+            this.feed_pet = false;
+            this.send(`Warning. companion could not be despawned`);
+          }
+        }
+      }
     }, (this.s.interval * 60 * 1000));
   }
 
@@ -116,26 +113,26 @@ class auto_pet {
     }
   }
 
-  // helper
-  try_spawn_pet() {
-    let pet = this.s.pet[this.g.me.name];
-    let res = this.m.trySend('C_REQUEST_SPAWN_SERVANT', 0, {
-      id: pet.id,
-      dbid: BigInt(pet.dbid)
-    });
-    return res;
-  }
-
-  try_feed_pet() {
+  handle_feed_pet() {
     if (this.pet) {
       this.m.send('C_USE_ITEM', 3, {
         gameId: this.g.me.gameId,
-        id: 206049,
+        id: 206049, // puppy figurine
         amount: 1,
         unk4: true
       });
       this.send(`Fed companion pet food.`);
     }
+  }
+
+  // helper
+  try_spawn_pet() {
+    let pet = this.s.pet[this.g.me.name];
+    return this.m.trySend('C_REQUEST_SPAWN_SERVANT', 81, { id: pet.id, dbid: BigInt(pet.dbid) });
+  }
+
+  try_despawn_pet() {
+    return this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 81, {});
   }
 
   // code
@@ -155,30 +152,6 @@ class auto_pet {
     this.hook('S_REQUEST_DESPAWN_SERVANT', 1, { order: 10 }, (e) => {
       this.pet === e.gameId ? this.pet = undefined : null;
     });
-
-    // fishing
-    this.hook('S_SYSTEM_MESSAGE', 1, { order: 10 }, (e) => {
-      if (this.s.enable && !this.s.fishing && this.pet) {
-        let msg = this.m.parseSystemMessage(e.message);
-
-        switch (msg.id) {
-          case 'SMT_ITEM_USED_ACTIVE':
-            let item = parseInt(msg.tokens.ItemName.substr(6), 10);
-            if (BAIT.includes(item)) {
-              this.send(`Fishing detected. despawning companion.`);
-              let despawn = this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 0, {});
-
-              if (despawn) {
-                this.to_spawn_next_zone = true;
-                this.m.clearInterval(this.food_interval);
-              }
-              else {
-                this.send(`Warning. companion could not be despawned`);
-              }
-            }
-        }
-      }
-    });
   }
 
   unload() {
@@ -187,6 +160,10 @@ class auto_pet {
         this.m.unhook(h);
       this.hooks = [];
     }
+
+    this.feed_pet = false;
+    this.food_interval = 0;
+    this.hold_feeding = false;
   }
 
   send() { this.c.message(': ' + [...arguments].join('\n - ')); }
