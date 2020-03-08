@@ -142,7 +142,7 @@ class auto_pet {
 
   load() {
     // servant
-    this.hook('S_REQUEST_SPAWN_SERVANT', 3, { order: 10 }, (e) => {
+    this.hook('S_REQUEST_SPAWN_SERVANT', 4, { order: 10 }, (e) => {
       if (e.ownerId === this.g.me.gameId) {
         this.pet = e.gameId;
         this.s.pet[this.g.me.name] = { id: e.id, dbid: e.dbid.toString() };
