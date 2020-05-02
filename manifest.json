@@ -1,8 +1,10 @@
 {
-	"files": {
-		"README.md": "65a0080f2dd1ed99442c5c5497c0941ffa426dc3ecd4b090b6dcf545949a246e",
-		"index.js": "b0b88681fe4072040aea5ed830fc074842a2e3cf8496d4b4eb9fb0d5ee9cb24b",
-		"module.json": "3b0093c5c13a861126758e6b96b2c902be5e97dc5ba93571a249f2f60c9db2c1",
-		"settings.js": "73ae7d87c7415f36e80ec486a13993725cb7eac390b8777569433a7aade6ac48"
-	}
+  "files": {
+    "README.md": "65a0080f2dd1ed99442c5c5497c0941ffa426dc3ecd4b090b6dcf545949a246e",
+    "def/C_REQUEST_DESPAWN_SERVANT.93.def": "2d6957b4bd80ba8143026fa03b30871859b3920d3a809d9f0dbb77c301f5ba80",
+    "def/C_REQUEST_SPAWN_SERVANT.93.def": "728558aea48dd99f492bbd06b8871ccbb6485098912871375610cdf733c0cd2d",
+    "index.js": "a04126f636a28aaf46b33d8209548ef7bd70f774b8e4f06113c1af389ca4cea4",
+    "module.json": "feb1fd445b415abba190ff76ff50cadc698958a969625c831a689c82ce5091e0",
+    "settings.js": "73ae7d87c7415f36e80ec486a13993725cb7eac390b8777569433a7aade6ac48"
+  }
 }
