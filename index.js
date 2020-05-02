@@ -20,8 +20,8 @@ class auto_pet {
 
     // set definition
     try {
-      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 81, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.81.def'), true);
-      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 81, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.81.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_SPAWN_SERVANT', 93, path.join(__dirname, 'def', 'C_REQUEST_SPAWN_SERVANT.93.def'), true);
+      this.m.dispatch.addDefinition('C_REQUEST_DESPAWN_SERVANT', 93, path.join(__dirname, 'def', 'C_REQUEST_DESPAWN_SERVANT.93.def'), true);
     } catch {
       this.m.warn(`Error. could not add required definition(s).`);
     }
@@ -91,26 +91,17 @@ class auto_pet {
           this.feed_pet = true;
         }
         else {
-          if (this.try_despawn_pet()) {
-            this.m.clearInterval(this.food_interval);
-            this.send(`Could not feed more than once, dismissing companion.`);
-          } else {
-            this.feed_pet = false;
-            this.send(`Warning. companion could not be despawned`);
-          }
+          this.m.clearInterval(this.food_interval);
+          this.send(`Could not feed more than once, disabled feeding interval.`);
         }
       }
     }, (this.s.interval * 60 * 1000));
   }
 
   handle_spawn_pet() {
-    if (this.try_spawn_pet()) {
-      this.m.clearInterval(this.food_interval);
-      this.handle_interval();
-      this.send(`Spawning companion.`);
-    } else {
-      this.send(`Warning. pet could not be spawned.`);
-    }
+    let res = this.try_spawn_pet();
+    this.m.clearInterval(this.food_interval);
+    res ? this.send(`Spawning companion.`) : this.send(`Warning. pet could not be spawned.`);
   }
 
   handle_feed_pet() {
@@ -127,12 +118,15 @@ class auto_pet {
 
   // helper
   try_spawn_pet() {
-    let pet = this.s.pet[this.g.me.name];
-    return this.m.trySend('C_REQUEST_SPAWN_SERVANT', 81, { id: pet.id, dbid: BigInt(pet.dbid) });
+    // v93+ issue
+    return false;
+    //let pet = this.s.pet[this.g.me.name];
+    //return this.m.trySend('C_REQUEST_SPAWN_SERVANT', 93, { id: pet.id, dbid: BigInt(pet.dbid) });
   }
 
   try_despawn_pet() {
-    return this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 81, {});
+    return false;
+    //return this.m.trySend('C_REQUEST_DESPAWN_SERVANT', 93, {});
   }
 
   // code
@@ -141,11 +135,11 @@ class auto_pet {
   }
 
   load() {
-    // servant
     this.hook('S_REQUEST_SPAWN_SERVANT', 4, { order: 10 }, (e) => {
       if (e.ownerId === this.g.me.gameId) {
         this.pet = e.gameId;
         this.s.pet[this.g.me.name] = { id: e.id, dbid: e.dbid.toString() };
+        this.handle_interval();
       }
     });
 
@@ -155,6 +149,8 @@ class auto_pet {
   }
 
   unload() {
+    this.m.clearInterval(this.food_interval);
+
     if (this.hooks.length) {
       for (let h of this.hooks)
         this.m.unhook(h);
@@ -166,7 +162,7 @@ class auto_pet {
     this.hold_feeding = false;
   }
 
-  send() { this.c.message(': ' + [...arguments].join('\n - ')); }
+  send(msg) { this.c.message(': ' + msg); }
 
   // reload
   saveState() {
