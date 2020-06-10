@@ -5,7 +5,7 @@
 </p>
 
 # auto-pet [![paypal](https://img.shields.io/badge/paypal-donate-333333.svg?colorA=253B80&colorB=333333)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B7QQJZV9L5P2J&source=url) [![paypal.me](https://img.shields.io/badge/paypal.me-donate-333333.svg?colorA=169BD7&colorB=333333)](https://www.paypal.me/seraphinush)
-tera-toolbox module to automatically spawn companion upon login
+tera-toolbox module to automatically feed summoned Partner
 ```
 Support seraph via paypal donations, thanks in advance !
 ```
@@ -16,14 +16,13 @@ Support seraph via paypal donations, thanks in advance !
 ## Usage
 - __pet__
   - Toggle on/off
-### Arguments
-- __set <num>__
-  - Set pet feeding interval to `num` minutes
-  - Default is `30` minutes
 
 ## Changelog
 <details>
 
+    2.00
+    - Removed spawning pet option
+    - Removed `set` option
     1.03
     - Removed `fishing` option
     1.02

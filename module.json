@@ -1,16 +1,16 @@
 {
   "author": "seraphinush",
-  "description": "tera-toolbox to automatically spawn companion upon login",
+  "description": "tera-toolbox to automatically feed summoned Partner",
   "disableAutoUpdate": false,
   "donationUrl": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B7QQJZV9L5P2J&source=url",
   "name": "auto-pet",
   "options": {
     "reloadable": true,
-    "settingsVersion": 3,
+    "settingsVersion": 4,
     "settingsFile": "config.json",
     "settingsMigrator": "settings.js"
   },
   "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-pet/master/"],
   "supportUrl": "https://github.com/seraphinush-gaming/auto-pet/blob/master/README.md",
-  "version": "1.04.02"
+  "version": "2.00.00"
 }

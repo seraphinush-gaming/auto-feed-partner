@@ -1,9 +1,7 @@
 'use strict';
 
 const DefaultSettings = {
-  "enable": true,
-  "interval": 30,
-  "pet": {}
+  "enable": true
 };
 
 function MigrateSettings(from_ver, to_ver, settings) {
@@ -22,6 +20,11 @@ function MigrateSettings(from_ver, to_ver, settings) {
     switch (to_ver) {
       case 3:
         delete settings.fishing;
+        break;
+      case 4:
+        delete settings.interval;
+        delete settings.pet;
+        break;
     }
 
     return settings;
