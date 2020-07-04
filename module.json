@@ -2,7 +2,7 @@
   "author": "seraphinush",
   "description": "tera-toolbox to automatically feed summoned Partner",
   "disableAutoUpdate": false,
-  "donationUrl": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=B7QQJZV9L5P2J&source=url",
+  "donationUrl": "https://www.paypal.me/seraphinush",
   "name": "auto-pet",
   "options": {
     "reloadable": true,
@@ -12,5 +12,5 @@
   },
   "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-pet/master/"],
   "supportUrl": "https://github.com/seraphinush-gaming/auto-pet/blob/master/README.md",
-  "version": "2.00.00"
+  "version": "2.00.01.v95.04"
 }
