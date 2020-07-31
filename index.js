@@ -56,4 +56,4 @@ class auto_feed_partner {
 
 }
 
-module.exports.NetworkMod = auto_feed_partner;
+module.exports = { NetworkMod: auto_feed_partner };
