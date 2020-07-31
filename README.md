@@ -4,14 +4,14 @@
 </a>
 </p>
 
-# auto-pet [![paypal.me](https://img.shields.io/badge/paypal.me-donate-333333.svg?colorA=253B80&colorB=333333)](https://www.paypal.me/seraphinush)
+# auto-feed-partner [![paypal](https://img.shields.io/badge/paypal.me-donate-333333.svg?colorA=0070BA&colorB=333333)](https://www.paypal.me/seraphinush)
 tera-toolbox module to automatically feed summoned Partner
 ```
 Support seraph via paypal donations, thanks in advance !
 ```
 
 ## Auto-update guide
-- Create a folder called `auto-pet` in `tera-toolbox/mods` and download >> [`module.json`](https://raw.githubusercontent.com/seraphinush-gaming/auto-pet/master/module.json) << (right-click this link and save link as..) into the folder
+- Create a folder called `auto-feed-partner` in `tera-toolbox/mods` and download >> [`module.json`](https://raw.githubusercontent.com/seraphinush-gaming/auto-feed-partner/master/module.json) << (right-click this link and save link as..) into the folder
 
 ## Usage
 - __pet__

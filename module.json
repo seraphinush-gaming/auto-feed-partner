@@ -3,14 +3,14 @@
   "description": "tera-toolbox to automatically feed summoned Partner",
   "disableAutoUpdate": false,
   "donationUrl": "https://www.paypal.me/seraphinush",
-  "name": "auto-pet",
+  "name": "auto-feed-partner",
   "options": {
     "reloadable": true,
     "settingsVersion": 4,
     "settingsFile": "config.json",
     "settingsMigrator": "settings.js"
   },
-  "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-pet/master/"],
-  "supportUrl": "https://github.com/seraphinush-gaming/auto-pet/blob/master/README.md",
-  "version": "2.00.01.v95.04"
+  "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-feed-partner/master/"],
+  "supportUrl": "https://github.com/seraphinush-gaming/auto-feed-partner/blob/master/README.md",
+  "version": "2.00.02.v95.05"
 }

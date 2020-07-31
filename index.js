@@ -2,7 +2,7 @@
 
 const PUPPY_FIGURINE = 206049;
 
-class auto_pet {
+class auto_feed_partner {
 
   constructor (mod) {
 
@@ -56,4 +56,4 @@ class auto_pet {
 
 }
 
-module.exports = auto_pet;
+module.exports.NetworkMod = auto_feed_partner;
