@@ -1,8 +1,12 @@
 {
-  "files": {
-    "README.md": "79eb6628a7e855c7597141dd4638d20fb6c1318bba0596400a12a937e300c077",
-    "index.js": "1e9da51a8f400d93d0875a33ae5ab050ff911af208415dae54e1e68cbab9349f",
-    "module.json": "70de3d5378d997246eb835960a338c2aae28c46b9d1b3e2349ee94101221bc59",
-    "settings.js": "71bd8501d0adfcfb91eb7ee2a74eef26d45ab486e02f5e72166a70c38093785a"
-  }
+	"files": {
+		"README.md": "79eb6628a7e855c7597141dd4638d20fb6c1318bba0596400a12a937e300c077",
+		"index.js": "1e9da51a8f400d93d0875a33ae5ab050ff911af208415dae54e1e68cbab9349f",
+		"module.json": "5d6085597738601a23f39ac15957022cb1f49421e8bdec131a773170338f7d56",
+		"settings.js": "71bd8501d0adfcfb91eb7ee2a74eef26d45ab486e02f5e72166a70c38093785a"
+	},
+	"defs": {
+		"C_USE_ITEM": 3,
+		"S_REQUEST_SPAWN_SERVANT": 4
+	}
 }
