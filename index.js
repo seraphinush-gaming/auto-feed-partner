@@ -8,6 +8,8 @@ class auto_feed_partner {
 
     this.mod = mod;
     this.command = mod.command;
+
+    // init
     this.hook = null;
 
     // command
