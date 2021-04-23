@@ -1,3 +1,8 @@
+### DEPRECATION NOTICE
+Deprecated. please refer to the in-game method (Self-Sufficient Gifted Skill) to automatically feed Partners.
+
+----
+
 ```
 Support seraph via donations, thanks in advance !
 ```
