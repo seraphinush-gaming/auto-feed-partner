@@ -1,6 +1,6 @@
 {
   "author": "seraphinush",
-  "description": "tera-toolbox to automatically feed summoned Partner",
+  "description": "tera-toolbox to automatically feed Puppy Figurine to summoned Partner",
   "disableAutoUpdate": false,
   "donationUrl": "https://www.paypal.me/seraphinush",
   "name": "auto-feed-partner",
@@ -12,5 +12,5 @@
   },
   "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-feed-partner/master/"],
   "supportUrl": "https://github.com/seraphinush-gaming/auto-feed-partner/blob/master/README.md",
-  "version": "2.00.07.v103.02"
+  "version": "2.01.00.v105.02"
 }

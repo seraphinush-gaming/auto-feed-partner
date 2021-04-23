@@ -6,6 +6,9 @@ class auto_feed_partner {
 
   constructor (mod) {
 
+    if (mod.majorPatchVersion >= 104)
+      return mod.warn('Deprecated. please refer to the in-game method (Self-Sufficient Gifted Skill) to automatically feed Partners.');
+
     this.mod = mod;
     this.command = mod.command;
     this.hook = null;

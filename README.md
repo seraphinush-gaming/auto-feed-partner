@@ -1,15 +1,15 @@
 ```
-Support seraph via paypal donations, thanks in advance !
+Support seraph via donations, thanks in advance !
 ```
 
 # auto-feed-partner [![](https://img.shields.io/badge/paypal-donate-333333.svg?colorA=0070BA&colorB=333333)](https://www.paypal.me/seraphinush) [![](https://img.shields.io/badge/patreon-pledge-333333.svg?colorA=F96854&colorB=333333)](https://www.patreon.com/seraphinush)
-tera-toolbox module to automatically feed summoned Partner
+tera-toolbox to automatically feed Puppy Figurine to summoned Partner
 
 ## Auto-update guide
 - Create a folder called `auto-feed-partner` in `tera-toolbox/mods` and download >> [`module.json`](https://raw.githubusercontent.com/seraphinush-gaming/auto-feed-partner/master/module.json) << (right-click this link and save link as..) into the folder
 
 ## Usage
-- __pet__
+- `pet`
   - Toggle on/off
 
 ## Info
@@ -18,6 +18,8 @@ tera-toolbox module to automatically feed summoned Partner
 ## Changelog
 <details>
 
+    2.01
+    - Deprecated
     2.00
     - Removed spawning partner option
     - Removed `set` option
