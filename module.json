@@ -10,7 +10,7 @@
     "settingsFile": "config.json",
     "settingsMigrator": "settings.js"
   },
-  "servers": ["https://raw.githubusercontent.com/seraphinush-gaming/auto-feed-partner/master/"],
-  "supportUrl": "https://github.com/seraphinush-gaming/auto-feed-partner/blob/master/README.md",
-  "version": "2.01.02.v105.02"
+  "servers": ["https://raw.githubusercontent.com/ylennia-archives/auto-feed-partner/master/"],
+  "supportUrl": "https://github.com/ylennia-archives/auto-feed-partner/blob/master/README.md",
+  "version": "2.01.03.v105.02"
 }
